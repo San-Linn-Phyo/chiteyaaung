@@ -6,14 +6,18 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { validateData } from "@/app/(auth)/_components/SigninForm/utils";
 import { useRouter } from "next/navigation";
+import { useLocalStorage } from "@/app/(chat)/messages/[uid]/_hooks/useLocalStorage";
+import { useFetch } from "@/app/_hooks/useFetch";
 
 export default function SigninForm() {
   const router = useRouter();
+  const { isLoading, data, post } = useFetch(
+    "http://localhost:3003/api/User/login",
+  );
 
   const [state, setState] = useState({
     name: "",
     password: "",
-    isLoading: false,
   });
 
   const [errorState, setErrorState] = useState({
@@ -21,50 +25,42 @@ export default function SigninForm() {
     passwordError: { message: "" },
   });
 
+  const { get, set } = useLocalStorage();
+
+  function setNoError() {
+    setErrorState({
+      nameError: { message: "" },
+      passwordError: { message: "" },
+    });
+  }
+
+  function signin(name, password) {
+    post({ params: { name, password } });
+  }
+
+  function alreadySignedIn() {
+    if (get("token") && get("uid")) return router.push("/messages");
+  }
+
+  function newSignedIn() {
+    set("token", data.token);
+    set("uid", data._id);
+    router.push("/messages");
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
-    try {
-      if (validateData(state)) {
-        // set no error
-        setErrorState({
-          nameError: { message: "" },
-          passwordError: { message: "" },
-        });
-
-        setState({ ...state, isLoading: true });
-
-        // signin new user using api
-        fetch("http://localhost:3003/api/User/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name: state.name, password: state.password }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (
-              !(localStorage.getItem("token") && localStorage.getItem("uid"))
-            ) {
-              localStorage.setItem("token", data.token);
-              localStorage.setItem("uid", data._id);
-            }
-            // router.push("/messages");
-          })
-          .catch((err) => console.error(err.message))
-          .finally(() => {
-            setState({ ...state, isLoading: false });
-          });
-      }
-    } catch (e) {
-      setErrorState(e);
+    if (validateData(state)) {
+      setNoError();
+      signin(state.name, state.password);
     }
   }
 
   useEffect(() => {
-    if (localStorage.getItem("token") && localStorage.getItem("uid"))
-      router.push("/messages");
-  }, []);
+    alreadySignedIn();
+    if (!data) return;
+    newSignedIn();
+  }, [data]);
 
   return (
     <>
@@ -87,7 +83,7 @@ export default function SigninForm() {
 
         <button className="btn btn-primary w-full mt-4" type="submit">
           Signin
-          {state.isLoading ? (
+          {isLoading ? (
             <span className="loading loading-spinner loading-sm"></span>
           ) : null}
         </button>

@@ -3,7 +3,7 @@ import Chat from "@/app/(chat)/messages/_components/Chat";
 
 export default function MessagePage({ params: { uid } }) {
   return (
-    <div className="grid grid-cols-[20%_50%_30%] h-screen w-full">
+    <div className="grid grid-cols-[20%_50%_30%] h-screen w-full overflow-y-hidden">
       <Sidebar uid={uid} />
       <Chat uid={uid} />
       <div className="bg-primary">rightsidebar</div>

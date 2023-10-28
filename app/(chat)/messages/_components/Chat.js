@@ -1,66 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { socket } from "@/app/socket";
+import MessagesHistory from "@/app/(chat)/messages/[uid]/_components/MessagesHistory";
+import { useSocket } from "@/app/(chat)/messages/[uid]/_hooks/useSocket";
+import { useEffect, useRef, useState } from "react";
+import { useLocalStorage } from "@/app/(chat)/messages/[uid]/_hooks/useLocalStorage";
 
 export default function Chat({ uid }) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messagesHistory, setMessagesHistory] = useState([]);
+  const { socket, isConnected } = useSocket();
+  const { get } = useLocalStorage();
+  const currentUID = get("uid");
+  const [loadMessages, setLoadMessages] = useState([]);
+  const messageInputRef = useRef(null);
 
-  function onSubmit(e) {
-    e.preventDefault();
-    if (isConnected) {
-      console.log("Send a message");
-      const data = {
-        to: uid,
-        from: localStorage.getItem("uid"),
-        message: message,
-      };
-      socket.emit("messageFromClient", data);
-      socket.on("message", (message) =>
-        setMessagesHistory([...messagesHistory, message]),
-      );
-    }
+  function sentAMessage(message) {
+    const msg = {
+      message: messageInputRef.current.value,
+      from: currentUID,
+      to: uid,
+    };
+    socket.emit("messageFromClient", msg);
   }
 
-  console.log("messagesHistory: ", messagesHistory);
+  function clearMessageInput() {
+    messageInputRef.current.value = "";
+  }
+
+  function onMessageFormSubmit(event) {
+    event.preventDefault();
+    const message = messageInputRef.current.value;
+    sentAMessage(message);
+    clearMessageInput();
+  }
 
   useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
+    if (!socket) return;
+
+    function onLoadedMessage(messages) {
+      setLoadMessages(() => messages);
     }
 
-    socket.connect();
-    socket.on("connect", onConnect);
+    function onMessage(message) {
+      setLoadMessages((prev) => [...prev, message]);
+    }
 
-    return () => socket.off("connect", onConnect);
-  }, []);
+    socket.emit("loadmessage");
+    socket.on("loadmessage", onLoadedMessage);
+    socket.on("message", onMessage);
+
+    return () => {
+      socket.off("loadmessage", onLoadedMessage);
+      socket.off("message", onMessage);
+    };
+  }, [socket]);
 
   return (
-    <div className="bg-secondary px-4 flex flex-col">
-      <div className="flex-grow">
-        {messagesHistory.map((history) => {
-          if (history.from._id === localStorage.getItem("uid")) {
-            return (
-              <div className="chat chat-end" key={history._id}>
-                <div className="chat-bubble">{history.message}</div>
-              </div>
-            );
-          }
-
-          return (
-            <div className="chat chat-start" key={history._id}>
-              <div className="chat-bubble">{history.message}</div>
-            </div>
-          );
-        })}
+    <div className="bg-secondary px-4 h-screen">
+      <div className="flex-grow max-  h-[88%] overflow-auto">
+        <MessagesHistory messages={loadMessages} from={get("uid")} />
       </div>
+
       <div className="py-6">
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onMessageFormSubmit}>
           <input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            ref={messageInputRef}
             type="text"
             placeholder="Type here"
             className="input input-bordered input-primary w-full"
