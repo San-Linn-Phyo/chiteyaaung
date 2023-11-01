@@ -7,5 +7,9 @@ export function useLocalStorage() {
     return localStorage.setItem(key, value);
   }
 
-  return { get, set };
+  function remove(key) {
+    return localStorage.removeItem(key);
+  }
+
+  return { get, set, remove };
 }

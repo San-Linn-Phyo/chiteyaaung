@@ -20,10 +20,32 @@ export function useFetch(url) {
     setUserOptions(options ?? defaultOptions);
   }
 
+  function postWithFile({ options, params }) {
+    const formData = new FormData();
+    formData.append("name", params.name);
+    formData.append("ph_no", params.ph_no);
+    formData.append("password", params.password);
+    formData.append("age", params.age);
+    formData.append("gender", params.gender);
+    formData.append("image", params.image);
+
+    const defaultOptions = {
+      method: "POST",
+      body: formData,
+    };
+
+    setStartFetching(true);
+    setIsLoading(true);
+    setUserOptions(options ?? defaultOptions);
+  }
+
   useEffect(() => {
     if (!startFetching) return;
 
     try {
+      console.log("URL", url);
+      console.log("UserOptions", userOptions);
+
       fetch(url, userOptions)
         .then((resp) => resp.json())
         .then((data) => {
@@ -36,5 +58,5 @@ export function useFetch(url) {
     }
   }, [userOptions]);
 
-  return { isLoading, data, post };
+  return { isLoading, data, post, postWithFile };
 }

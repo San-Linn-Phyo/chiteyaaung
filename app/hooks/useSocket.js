@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
@@ -6,7 +8,10 @@ export function useSocket() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("user_data")
+      ? JSON.parse(localStorage.getItem("user_data")).token
+      : "";
+    console.log("userdata", JSON.parse(localStorage.getItem("user_data")));
     const socket = io(`http://localhost:3003/chat?token=${token}`);
 
     function onConnect() {
@@ -14,6 +19,8 @@ export function useSocket() {
       setSocket(socket);
       setIsConnected(true);
     }
+
+    console.log("Testing");
 
     socket.on("connect", onConnect);
 

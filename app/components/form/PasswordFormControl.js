@@ -1,33 +1,37 @@
 export default function PasswordFormControl({
   fieldFor,
-  placeholder,
   value,
-  setValue,
+  onChange,
   errorMsg,
+  autoFocus,
 }) {
   function handleChange(e) {
-    return setValue({ ...value, password: e.target.value });
+    const { fun, key } = onChange;
+    fun((preValue) => {
+      const newValue = { ...preValue };
+      newValue[key] = e.target.value;
+      return newValue;
+    });
   }
 
   return (
     <div className="form-control w-full">
-      <label className="label">
+      <label className="label" htmlFor={fieldFor}>
         <span className="label-text">{fieldFor}</span>
       </label>
       <input
+        autoFocus={autoFocus || false}
+        id={fieldFor}
         value={value.password}
         onChange={handleChange}
         type="password"
-        placeholder={placeholder}
+        placeholder={`Type your ${fieldFor.toLowerCase()}`}
         className="input input-bordered w-full"
         autoComplete="true"
       />
       <label className="label">
-        <span
-          className={`label-text-alt text-error ${!errorMsg ? "hidden" : null}`}
-        >
-          {errorMsg === "required" ? `${fieldFor} field is required` : null}
-          {errorMsg === "invalid" ? `Invalid ${fieldFor} value` : null}
+        <span className={`label-text-alt text-error ${!errorMsg && "hidden"}`}>
+          {errorMsg}
         </span>
       </label>
     </div>

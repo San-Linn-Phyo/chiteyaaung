@@ -1,12 +1,19 @@
 "use client";
 
-import TextFormControl from "@/app/(auth)/_components/TextFormControl";
-import PasswordFormControl from "@/app/(auth)/_components/PasswordFormControl";
-import { useState } from "react";
-import { validateData } from "@/app/(auth)/_components/SignupForm/utils";
+import TextFormControl from "@/app/components/form/TextFormControl";
+import PasswordFormControl from "@/app/components/form/PasswordFormControl";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useLocalStorage } from "@/app/hooks/useLocalStorage";
+import validate from "@/app/utils/form";
+import NumberFormControl from "@/app/components/form/NumberFormControl";
+import { validateUser } from "@/app/utils/cookie";
 
 export default function SignupForm({ children }) {
+  const router = useRouter();
+  const { set } = useLocalStorage();
+
   const [state, setState] = useState({
     name: "",
     phoneNumber: "",
@@ -15,72 +22,64 @@ export default function SignupForm({ children }) {
   });
 
   const [errorState, setErrorState] = useState({
-    nameError: { message: "" },
-    phoneNumberError: { message: "" },
-    passwordError: { message: "" },
+    nameError: "",
+    phoneNumberError: "",
+    passwordError: "",
   });
+
+  function saveTempInLocalStorage() {
+    localStorage.setItem(
+      "user_temp_data",
+      JSON.stringify({
+        name: state.name,
+        phoneNumber: state.phoneNumber,
+        password: state.password,
+      })
+    );
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
-    try {
-      if (validateData(state)) {
-        // set no error
-        setErrorState({
-          nameError: { message: "" },
-          phoneNumberError: { message: "" },
-          passwordError: { message: "" },
-        });
-
-        setState({ ...state, isLoading: true });
-
-        console.log("state ", state);
-
-        // register new user using api
-        fetch("http://localhost:3003/api/User/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: state.name,
-            ph_no: state.phoneNumber,
-            password: state.password,
-            age: 14,
-            gender: "Male",
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => console.log(data))
-          .catch((err) => console.error(err));
-      }
-    } catch (e) {
-      setErrorState(e);
+    const result = validate(state);
+    if (result.status === "pass") {
+      saveTempInLocalStorage();
+      router.push("/signup/profile");
+      return;
     }
+    setErrorState(result.error);
   }
+
+  useEffect(() => {
+    function alreadySignedIn() {
+      const userData = JSON.parse(localStorage.getItem("user_data"));
+      if (userData) router.push("/messages");
+    }
+
+    alreadySignedIn();
+  }, []);
 
   return (
     <>
       <form onSubmit={handleSubmit}>
         <TextFormControl
+          autoFocus={true}
           fieldFor="Name"
-          placeholder="Type your name"
-          value={state}
-          setValue={setState}
-          errorMsg={errorState.nameError.message}
+          value={state.name}
+          onChange={{ fun: setState, key: "name" }}
+          errorMsg={errorState.nameError}
         />
-        <TextFormControl
+
+        <NumberFormControl
           fieldFor="Phone Number"
-          placeholder="Type your phone number"
-          value={state}
-          setValue={setState}
-          errorMsg={errorState.phoneNumberError.message}
+          onChange={{ fun: setState, key: "phoneNumber" }}
+          errorMsg={errorState.phoneNumberError}
         />
+
         <PasswordFormControl
           fieldFor="Password"
-          placeholder="Type your password"
-          value={state}
-          setValue={setState}
-          errorMsg={errorState.passwordError.message}
+          value={state.password}
+          onChange={{ fun: setState, key: "password" }}
+          errorMsg={errorState.passwordError}
         />
 
         <button className="btn btn-primary w-full mt-4" type="submit">

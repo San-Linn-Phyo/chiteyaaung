@@ -1,11 +1,11 @@
-export function validatePhoneNumber(phoneNumber, error) {
+function validatePhoneNumber(phoneNumber, error) {
   if (!phoneNumber.match(/^(09|\\+?950?9|\\+?95950?9)\d{7,9}$/)) {
     error.phoneNumberError.message = "invalid";
     throw error;
   }
 }
 
-export function validateData({ name, phoneNumber, password }) {
+function validateData({ name, phoneNumber, password }) {
   const error = {
     nameError: { message: "" },
     phoneNumberError: { message: "" },

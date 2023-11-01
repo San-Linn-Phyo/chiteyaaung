@@ -1,7 +1,8 @@
-import ChatEnd from "@/app/(chat)/messages/[uid]/_components/ChatEnd";
-import ChatStart from "@/app/(chat)/messages/[uid]/_components/ChatStart";
+import ChatEnd from "@/app/components/chat/ChatEnd";
+import ChatStart from "@/app/components/chat/ChatStart";
 
 export default function MessagesHistory({ messages, from }) {
+  console.log("MessagesHistory", from);
   return (
     <>
       {messages.map((message) => {

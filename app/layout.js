@@ -8,8 +8,6 @@ export const metadata = {
   description: "A simple dating chat app where users can chat with each other.",
 };
 
-// {/*<body className={`${inter.className} max-w-6xl mx-auto py-20`}>*/}
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="valentine">

@@ -1,14 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useLocalStorage } from "@/app/(chat)/messages/[uid]/_hooks/useLocalStorage";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UsersList({ users, uid }) {
-  const { get } = useLocalStorage();
-  const result = users.filter((user) => user._id !== get("uid"));
+  const [result, setResult] = useState([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    if (!userData) return router.push("/signup");
+    setResult(users.filter((user) => user._id !== userData._id));
+  }, []);
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-2 p-4">
       {result.map((user) => {
         return (
           <div
@@ -25,7 +32,7 @@ export default function UsersList({ users, uid }) {
               </div>
             </div>
 
-            <p>{user.name}</p>
+            <span>{user.name}</span>
 
             <Link
               href={`/messages/${user._id}`}

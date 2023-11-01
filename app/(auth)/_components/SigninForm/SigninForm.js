@@ -1,18 +1,19 @@
 "use client";
 
-import TextFormControl from "@/app/(auth)/_components/TextFormControl";
-import PasswordFormControl from "@/app/(auth)/_components/PasswordFormControl";
+import TextFormControl from "@/app/components/form/TextFormControl";
+import PasswordFormControl from "@/app/components/form/PasswordFormControl";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { validateData } from "@/app/(auth)/_components/SigninForm/utils";
 import { useRouter } from "next/navigation";
-import { useLocalStorage } from "@/app/(chat)/messages/[uid]/_hooks/useLocalStorage";
-import { useFetch } from "@/app/_hooks/useFetch";
+import { useLocalStorage } from "@/app/hooks/useLocalStorage";
+import { useFetch } from "@/app/hooks/useFetch";
+import validate from "@/app/utils/form";
+import { validateUser } from "@/app/utils/cookie";
 
 export default function SigninForm() {
   const router = useRouter();
   const { isLoading, data, post } = useFetch(
-    "http://localhost:3003/api/User/login",
+    "http://localhost:3003/api/User/login"
   );
 
   const [state, setState] = useState({
@@ -21,16 +22,16 @@ export default function SigninForm() {
   });
 
   const [errorState, setErrorState] = useState({
-    nameError: { message: "" },
-    passwordError: { message: "" },
+    nameError: "",
+    passwordError: "",
   });
 
   const { get, set } = useLocalStorage();
 
   function setNoError() {
     setErrorState({
-      nameError: { message: "" },
-      passwordError: { message: "" },
+      nameError: "",
+      passwordError: "",
     });
   }
 
@@ -39,21 +40,25 @@ export default function SigninForm() {
   }
 
   function alreadySignedIn() {
-    if (get("token") && get("uid")) return router.push("/messages");
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    if (userData) router.push("/messages");
   }
 
   function newSignedIn() {
-    set("token", data.token);
-    set("uid", data._id);
+    localStorage.setItem("user_data", JSON.stringify(data));
     router.push("/messages");
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (validateData(state)) {
+    const result = validate(state);
+    if (result.status === "pass") {
       setNoError();
       signin(state.name, state.password);
+      return;
     }
+
+    setErrorState(result.error);
   }
 
   useEffect(() => {
@@ -66,19 +71,18 @@ export default function SigninForm() {
     <>
       <form onSubmit={handleSubmit}>
         <TextFormControl
+          autoFocus={true}
           fieldFor="Name"
-          placeholder="Type your name"
-          value={state}
-          setValue={setState}
-          errorMsg={errorState.nameError.message}
+          value={state.name}
+          onChange={{ fun: setState, key: "name" }}
+          errorMsg={errorState.nameError}
         />
 
         <PasswordFormControl
           fieldFor="Password"
-          placeholder="Type your password"
-          value={state}
-          setValue={setState}
-          errorMsg={errorState.passwordError.message}
+          value={state.password}
+          onChange={{ fun: setState, key: "password" }}
+          errorMsg={errorState.passwordError}
         />
 
         <button className="btn btn-primary w-full mt-4" type="submit">
