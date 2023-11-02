@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Avatar from "@/app/assets/Avatar";
+import Avatar from "@/app/assets/icons/Avatar";
 import Image from "next/image";
 
 export default function ImageUploaderPreview({ errorMsg, onChange }) {

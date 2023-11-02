@@ -2,7 +2,7 @@ import ChatEnd from "@/app/components/chat/ChatEnd";
 import ChatStart from "@/app/components/chat/ChatStart";
 
 export default function MessagesHistory({ messages, from }) {
-  console.log("MessagesHistory", from);
+  console.log("MessagesHistory", messages);
   return (
     <>
       {messages.map((message) => {
@@ -10,7 +10,7 @@ export default function MessagesHistory({ messages, from }) {
           return (
             <ChatEnd
               message={message.message}
-              sender={message.from.name}
+              sender={message.from}
               key={message._id}
             />
           );
@@ -19,7 +19,7 @@ export default function MessagesHistory({ messages, from }) {
         return (
           <ChatStart
             message={message.message}
-            sender={message.from.name}
+            sender={message.from}
             key={message._id}
           />
         );

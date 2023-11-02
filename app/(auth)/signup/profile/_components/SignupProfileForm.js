@@ -82,7 +82,7 @@ export default function SignupProfileForm() {
 
       <SelectFormControl
         fieldFor="Gender"
-        options={["Male", "Female", "Others"]}
+        options={["Male", "Female"]}
         errorMsg={errorState.genderError}
         value={state.gender}
         onChange={{ fun: setState, key: "gender" }}

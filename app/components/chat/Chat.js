@@ -3,9 +3,9 @@ import { useState, useRef, useEffect } from "react";
 import { useSocket } from "@/app/hooks/useSocket";
 import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import MessagesHistory from "@/app/components/chat/MessagesHistory";
-import Greeting from "@/app/assets/Greeting";
+import Greeting from "@/app/assets/icons/Greeting";
 
-export default function Chat({ uid }) {
+export default function Chat({ user }) {
   const messageInputRef = useRef(null);
   const { socket } = useSocket();
   const [loadMessages, setLoadMessages] = useState([]);
@@ -18,7 +18,7 @@ export default function Chat({ uid }) {
     const msg = {
       message: messageInputRef.current.value,
       from: currentUID,
-      to: uid,
+      to: user._id,
     };
     socket.emit("messageFromClient", msg);
   }
@@ -48,7 +48,7 @@ export default function Chat({ uid }) {
       setLoadMessages((prev) => [...prev, message]);
     }
 
-    socket.emit("loadmessage", { to: uid });
+    socket.emit("loadmessage", { to: user._id });
     socket.on("loadmessage", onLoadedMessage);
     socket.on("message", onMessage);
 
@@ -61,12 +61,14 @@ export default function Chat({ uid }) {
   return (
     <div className="w-4/5 mx-auto bg-accent rounded-lg h-full max-h-full overflow-auto">
       <div className="p-4 shadow sticky top-0">
-        <div className="avatar placeholder">
-          <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
-            <span>{uid}</span>
+        <div className="flex items-center">
+          <div className="avatar placeholder">
+            <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
+              <img src={user.image} alt={user.name} />
+            </div>
           </div>
+          <span className="ms-4">{user.name}</span>
         </div>
-        <span className="ms-4">Name</span>
       </div>
 
       <div

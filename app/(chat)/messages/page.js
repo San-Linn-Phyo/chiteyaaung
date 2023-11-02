@@ -1,13 +1,17 @@
 import Header from "@/app/components/chat/Header";
 import Sidebar from "@/app/components/chat/Sidebar";
 
-export default function MessagePage() {
+export default async function MessagePage() {
+  const users = await (
+    await fetch("http://localhost:3003/api/User/user")
+  ).json();
+
   return (
     <div className="flex flex-col min-h-screen max-h-screen overflow-hidden">
       <Header />
 
       <div className="flex-grow grid grid-cols-[20%_80%] py-4 px-8 max-h-full min-h-full">
-        <Sidebar />
+        <Sidebar users={users} />
 
         <div className="grid items-center justify-center">
           <div>

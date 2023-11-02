@@ -28,7 +28,7 @@ export default function UsersList({ users, uid }) {
           >
             <div className="avatar placeholder">
               <div className="bg-neutral-focus text-neutral-content rounded-full w-16">
-                <span className="text-xl">JO</span>
+                <img src={user.image} alt={user.name} />
               </div>
             </div>
 
