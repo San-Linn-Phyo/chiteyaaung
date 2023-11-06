@@ -5,18 +5,16 @@ import Header from "@/app/components/chat/Header";
 
 export default async function MessagePage({ params: { uid } }) {
   const users = await (
-    await fetch("http://localhost:3003/api/User/user")
+    await fetch("http://localhost:3003/api/User/user", { cache: "no-cache" })
   ).json();
 
   const [user] = users.filter((user) => user._id === uid);
-
-  console.log("Users: ", users);
   return (
     <div className="flex flex-col min-h-screen max-h-screen">
       <Header />
 
       <div className="flex-grow grid grid-cols-[20%_60%_20%] py-4 px-8 h-full max-h-full overflow-hidden">
-        <Sidebar uid={uid} users={users} />
+        <Sidebar uid={uid} />
         <Chat user={user} />
         <RightSidebar user={user} />
       </div>

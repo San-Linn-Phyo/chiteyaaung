@@ -1,5 +1,4 @@
 export default function ChatStart({ message, sender }) {
-  console.log("Sender ", sender);
   return (
     <div className="chat chat-start">
       <div className="chat-bubble">{message}</div>

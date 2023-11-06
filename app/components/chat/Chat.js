@@ -1,26 +1,28 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
-import { useSocket } from "@/app/hooks/useSocket";
-import { useLocalStorage } from "@/app/hooks/useLocalStorage";
-import MessagesHistory from "@/app/components/chat/MessagesHistory";
 import Greeting from "@/app/assets/icons/Greeting";
+import MessagesHistory from "@/app/components/chat/MessagesHistory";
+import { CurrentUserContext } from "@/app/providers/CurrentUserProvider";
+import { SocketContext } from "@/app/providers/SocketProvider";
+import { useContext, useEffect, useRef, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Chat({ user }) {
   const messageInputRef = useRef(null);
-  const { socket } = useSocket();
+  const { isConnected, socket } = useContext(SocketContext);
+  const { currentUser } = useContext(CurrentUserContext);
   const [loadMessages, setLoadMessages] = useState([]);
-  const { get } = useLocalStorage();
-  const currentUID = get("user_data")
-    ? JSON.parse(get("user_data"))._id
-    : undefined;
 
   function sentAMessage(message) {
     const msg = {
-      message: messageInputRef.current.value,
-      from: currentUID,
+      message: message,
+      from: currentUser._id,
       to: user._id,
     };
-    socket.emit("messageFromClient", msg);
+    // socket.emit("messageFromClient", msg);
+    // my way
+    // TODO:: May be delete this later
+    // listen this using "receiveAMessage"
+    socket.emit("sendAMessage", msg);
   }
 
   function clearMessageInput() {
@@ -34,29 +36,88 @@ export default function Chat({ user }) {
     clearMessageInput();
   }
 
-  console.log("Messages", loadMessages);
-
   useEffect(() => {
-    console.log("Socket: ", socket);
-    if (!socket) return;
+    if (!isConnected) return;
 
     function onLoadedMessage(messages) {
       setLoadMessages(() => messages);
     }
 
-    function onMessage(message) {
-      setLoadMessages((prev) => [...prev, message]);
-    }
+    // function onMessage(message) {
+    //   console.log("onMessage: ", message);
+    //   setLoadMessages((prev) => [...prev, message]);
+
+    // if (
+    //   message.from._id === user._id ||
+    //   message.from._id === currentUser._id
+    // ) {
+    // }
+    // }
 
     socket.emit("loadmessage", { to: user._id });
     socket.on("loadmessage", onLoadedMessage);
-    socket.on("message", onMessage);
+    // socket.on("message", onMessage);
+
+    // my way
+    // TODO:: May be delete later
+
+    function onReceivingMessage(message) {
+      setLoadMessages((prev) => {
+        console.log("Example message: ", prev[0]);
+        console.log("Message: ", message);
+        return [...prev, message];
+      });
+    }
+
+    function onReceivingNewUnreadMessage({ sender, message }) {
+      toast.custom((t) => (
+        <div
+          className={`${
+            t.visible ? "animate-enter" : "animate-leave"
+          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 pt-0.5">
+                <img
+                  className="h-10 w-10 rounded-full"
+                  src={sender.image}
+                  alt={sender.name}
+                />
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-gray-900">
+                  {sender.name}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">{message}</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      ));
+    }
+
+    socket.emit("startsChattingWith", user._id);
+    socket.on("receiveAMessage", onReceivingMessage);
+    socket.on("newUnreadMessage", onReceivingNewUnreadMessage);
 
     return () => {
       socket.off("loadmessage", onLoadedMessage);
-      socket.off("message", onMessage);
+      // socket.off("message", onMessage);
+      // my way
+      // TODO:: May be delete later
+      socket.off("receiveAMessage", onReceivingMessage);
+      socket.off("newUnreadMessage", onReceivingNewUnreadMessage);
     };
-  }, [socket]);
+  }, [isConnected]);
 
   return (
     <div className="w-4/5 mx-auto bg-accent rounded-lg h-full max-h-full overflow-auto">
@@ -64,10 +125,10 @@ export default function Chat({ user }) {
         <div className="flex items-center">
           <div className="avatar placeholder">
             <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
-              <img src={user.image} alt={user.name} />
+              <img src={user?.image} alt={user?.name} />
             </div>
           </div>
-          <span className="ms-4">{user.name}</span>
+          <span className="ms-4">{user?.name}</span>
         </div>
       </div>
 
@@ -81,8 +142,8 @@ export default function Chat({ user }) {
           </div>
         ) : (
           <div className="max-h-full">
-            {currentUID && (
-              <MessagesHistory messages={loadMessages} from={currentUID} />
+            {currentUser && (
+              <MessagesHistory messages={loadMessages} from={currentUser._id} />
             )}
           </div>
         )}
@@ -98,6 +159,8 @@ export default function Chat({ user }) {
           />
         </form>
       </div>
+
+      <Toaster position="bottom-left" reverseOrder={false} />
     </div>
   );
 }

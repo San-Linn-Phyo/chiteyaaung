@@ -4,13 +4,13 @@ export default function RightSidebar({ user }) {
       <div>
         <div className="avatar placeholder">
           <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
-            <img src={user.image} alt={user.name} />
+            <img src={user?.image} alt={user?.name} />
           </div>
         </div>
 
-        <p className="mt-4">{user.name}</p>
-        <p className="mt-2">{user.gender}</p>
-        <p className="mt-2">{user.age}</p>
+        <p className="mt-4">{user?.name}</p>
+        <p className="mt-2">{user?.gender}</p>
+        <p className="mt-2">{user?.age}</p>
       </div>
     </div>
   );

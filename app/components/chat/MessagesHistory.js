@@ -2,7 +2,6 @@ import ChatEnd from "@/app/components/chat/ChatEnd";
 import ChatStart from "@/app/components/chat/ChatStart";
 
 export default function MessagesHistory({ messages, from }) {
-  console.log("MessagesHistory", messages);
   return (
     <>
       {messages.map((message) => {
