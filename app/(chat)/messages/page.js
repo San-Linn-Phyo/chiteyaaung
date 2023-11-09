@@ -1,15 +1,15 @@
-import Header from "@/app/components/chat/Header";
-import Sidebar from "@/app/components/chat/Sidebar";
+import Header from '@/app/components/chat/Header';
+import Sidebar from '@/app/components/chat/Sidebar';
 
 export default function MessagePage() {
   return (
     <div className="flex flex-col min-h-screen max-h-screen overflow-hidden">
       <Header />
 
-      <div className="flex-grow grid grid-cols-[20%_80%] py-4 px-8 max-h-full min-h-full">
+      <div className="flex-grow grid lg:grid-cols-[20%_80%] py-4 px-4 lg:px-8 max-h-full min-h-full">
         <Sidebar />
 
-        <div className="grid items-center justify-center">
+        <div className="lg:grid items-center justify-center hidden">
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"

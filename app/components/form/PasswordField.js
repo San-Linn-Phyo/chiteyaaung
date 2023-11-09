@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Eye } from "@/app/assets/icons/Eye";
-import { EyeSlash } from "@/app/assets/icons/EyeSlash";
-import { useState } from "react";
+import { Eye } from '@/app/assets/icons/Eye';
+import { EyeSlash } from '@/app/assets/icons/EyeSlash';
+import { useState } from 'react';
 
 export default function PasswordField({
   onChange,
@@ -24,7 +24,7 @@ export default function PasswordField({
       <div className="relative">
         <input
           id="password"
-          type={!showPassword ? "password" : "text"}
+          type={!showPassword ? 'password' : 'text'}
           className="input input-bordered w-full pe-16"
           placeholder="Type your password here"
           onChange={onChange}
@@ -37,7 +37,7 @@ export default function PasswordField({
           onClick={togglePasswordMode}
           disabled={disabled}
         >
-          {!showPassword ? <EyeSlash /> : <Eye />}
+          {showPassword ? <EyeSlash /> : <Eye />}
         </button>
       </div>
       <label className="label">
