@@ -1,21 +1,33 @@
 // TODO:: Protect the route.
 
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { CurrentUserContext } from "@/app/providers/CurrentUserProvider";
-import { UsersContext } from "@/app/providers/UsersProvider";
+import { SocketContext } from '@/app/providers/SocketProvider';
+import { UsersContext } from '@/app/providers/UsersProvider';
+import Link from 'next/link';
+import { useContext, useEffect, useState } from 'react';
 
 export default function Sidebar({ uid }) {
-  // const { currentUser } = useContext(CurrentUserContext);
   const { users } = useContext(UsersContext);
-  const router = useRouter();
+  const [userStatus, setUserStatus] = useState({ id: null, active: false });
+  const { isConnected, socket } = useContext(SocketContext);
 
-  // useEffect(() => {
-  //   if (!currentUser) router.push("/signin");
-  // }, [currentUser]);
+  useEffect(() => {
+    if (!isConnected) return;
+
+    function onUserStatus({ activeUserID, status, activeUserName }) {
+      setUserStatus({ id: activeUserID, active: status });
+      console.log('onUserStatus: ', activeUserID, status, activeUserName);
+    }
+
+    socket.on('userStatus', onUserStatus);
+
+    return () => {
+      socket.off('userStatus', onUserStatus);
+    };
+  }, [isConnected]);
+
+  console.log('USERS: ', users);
 
   return (
     <div className="bg-accent rounded-lg max-h-full min-h-full overflow-auto relative">
@@ -30,14 +42,23 @@ export default function Sidebar({ uid }) {
               key={user._id}
               className={`flex items-center gap-4 p-4 rounded-2xl relative ${
                 user._id === uid
-                  ? "bg-primary bg-opacity-50"
-                  : "hover:bg-primary hover:bg-opacity-50"
+                  ? 'bg-primary bg-opacity-50'
+                  : 'hover:bg-primary hover:bg-opacity-50'
               }`}
             >
               <div className="avatar placeholder">
-                <div className="bg-neutral-focus text-neutral-content rounded-full w-16">
+                <div className="bg-neutral-focus text-neutral-content rounded-full w-16 ring-primary ring-offset-base-100 ring-offset-2 ring">
                   <img src={user.image} alt={user.name} />
                 </div>
+
+                <span
+                  className={`absolute top-0 right-0 w-2 h-2 bg-success rounded-full -translate-y-full ${
+                    user.isActive ||
+                    (user._id === userStatus.id && userStatus.active)
+                      ? ''
+                      : 'hidden'
+                  }`}
+                />
               </div>
 
               <span>{user.name}</span>

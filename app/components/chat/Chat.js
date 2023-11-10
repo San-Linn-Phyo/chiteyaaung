@@ -1,10 +1,10 @@
-"use client";
-import Greeting from "@/app/assets/icons/Greeting";
-import MessagesHistory from "@/app/components/chat/MessagesHistory";
-import { CurrentUserContext } from "@/app/providers/CurrentUserProvider";
-import { SocketContext } from "@/app/providers/SocketProvider";
-import { useContext, useEffect, useRef, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+'use client';
+import Greeting from '@/app/assets/icons/Greeting';
+import MessagesHistory from '@/app/components/chat/MessagesHistory';
+import { CurrentUserContext } from '@/app/providers/CurrentUserProvider';
+import { SocketContext } from '@/app/providers/SocketProvider';
+import { useContext, useEffect, useRef, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function Chat({ user }) {
   const messageInputRef = useRef(null);
@@ -22,11 +22,11 @@ export default function Chat({ user }) {
     // my way
     // TODO:: May be delete this later
     // listen this using "receiveAMessage"
-    socket.emit("sendAMessage", msg);
+    socket.emit('sendAMessage', msg);
   }
 
   function clearMessageInput() {
-    messageInputRef.current.value = "";
+    messageInputRef.current.value = '';
   }
 
   function onMessageFormSubmit(event) {
@@ -41,6 +41,7 @@ export default function Chat({ user }) {
 
     function onLoadedMessage(messages) {
       setLoadMessages(() => messages);
+      console.log('LOaded: ', messages);
     }
 
     // function onMessage(message) {
@@ -54,8 +55,8 @@ export default function Chat({ user }) {
     // }
     // }
 
-    socket.emit("loadmessage", { to: user._id });
-    socket.on("loadmessage", onLoadedMessage);
+    socket.emit('loadmessage', { to: user._id });
+    socket.on('loadmessage', onLoadedMessage);
     // socket.on("message", onMessage);
 
     // my way
@@ -63,8 +64,8 @@ export default function Chat({ user }) {
 
     function onReceivingMessage(message) {
       setLoadMessages((prev) => {
-        console.log("Example message: ", prev[0]);
-        console.log("Message: ", message);
+        console.log('Example message: ', prev[0]);
+        console.log('Message: ', message);
         return [...prev, message];
       });
     }
@@ -73,7 +74,7 @@ export default function Chat({ user }) {
       toast.custom((t) => (
         <div
           className={`${
-            t.visible ? "animate-enter" : "animate-leave"
+            t.visible ? 'animate-enter' : 'animate-leave'
           } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
         >
           <div className="flex-1 w-0 p-4">
@@ -105,17 +106,17 @@ export default function Chat({ user }) {
       ));
     }
 
-    socket.emit("startsChattingWith", user._id);
-    socket.on("receiveAMessage", onReceivingMessage);
-    socket.on("newUnreadMessage", onReceivingNewUnreadMessage);
+    socket.emit('startsChattingWith', user._id);
+    socket.on('receiveAMessage', onReceivingMessage);
+    socket.on('newUnreadMessage', onReceivingNewUnreadMessage);
 
     return () => {
-      socket.off("loadmessage", onLoadedMessage);
+      socket.off('loadmessage', onLoadedMessage);
       // socket.off("message", onMessage);
       // my way
       // TODO:: May be delete later
-      socket.off("receiveAMessage", onReceivingMessage);
-      socket.off("newUnreadMessage", onReceivingNewUnreadMessage);
+      socket.off('receiveAMessage', onReceivingMessage);
+      socket.off('newUnreadMessage', onReceivingNewUnreadMessage);
     };
   }, [isConnected]);
 
@@ -134,7 +135,7 @@ export default function Chat({ user }) {
 
       <div
         className="relative overflow-auto px-4 h-full pt-4"
-        style={{ maxHeight: "calc(100% - 176px)" }}
+        style={{ maxHeight: 'calc(100% - 176px)' }}
       >
         {!loadMessages.length ? (
           <div className="grid items-center justify-center h-full">
