@@ -1,5 +1,3 @@
-// TODO:: Fix auto submit when image file is choosen.
-
 'use client';
 
 import Loader from '@/app/components/Loader';
@@ -9,20 +7,21 @@ import ImageField from '@/app/components/form/ImageField';
 import NameField from '@/app/components/form/NameField';
 import PasswordField from '@/app/components/form/PasswordField';
 import PhoneNumberField from '@/app/components/form/PhoneNumberField';
-import { CurrentUserContext } from '@/app/providers/CurrentUserProvider';
+import { useLocalStorage } from '@/app/hooks/useLocalStorage';
 import { signUpValidationSchema } from '@/app/schemas/signUpValidationSchema';
 import { useFormik } from 'formik';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function SignupPage() {
   const router = useRouter();
-  const { currentUser } = useContext(CurrentUserContext);
   const [currentStep, setCurrentStep] = useState(0);
   const [previousStep, setPreviousStep] = useState(0);
   const delta = currentStep - previousStep;
+  const [isLoading, setIsLoading] = useState(true);
+  const { get } = useLocalStorage();
 
   const formik = useFormik({
     initialValues: {
@@ -82,8 +81,21 @@ export default function SignupPage() {
   }
 
   useEffect(() => {
-    if (currentUser) router.push('/messages');
-  }, [currentUser]);
+    const isSignedIn = get('user_data');
+    if (isSignedIn) {
+      router.push('/messages');
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="grid h-screen items-center justify-center">
+        <Loader className="animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>

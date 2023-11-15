@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createContext, useEffect, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { createContext, useEffect, useState } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export const CurrentUserContext = createContext(undefined);
 
@@ -10,7 +10,7 @@ export default function CurrentUserProvider({ children }) {
   const { get } = useLocalStorage();
 
   useEffect(() => {
-    const user = get("user_data");
+    const user = get('user_data');
     if (!user) return;
     setCurrentUser(JSON.parse(user));
   }, []);

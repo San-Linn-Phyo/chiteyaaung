@@ -8,14 +8,16 @@ import { CurrentUserContext } from '@/app/providers/CurrentUserProvider';
 import { signInValidationSchema } from '@/app/schemas/signInValidationSchema';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function SigninPage() {
   const router = useRouter();
-  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
-  const { set } = useLocalStorage();
+  const { setCurrentUser } = useContext(CurrentUserContext);
+  const { get, set } = useLocalStorage();
+  const [isLoading, setIsLoading] = useState(true);
 
   const formik = useFormik({
     initialValues: {
@@ -24,34 +26,49 @@ export default function SigninPage() {
     },
     validationSchema: signInValidationSchema,
     onSubmit: (values, { setSubmitting }) => {
-      fetch('http://localhost:3003/api/User/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: values.name, password: values.password }),
-        cache: 'no-cache',
-      })
-        .then((resp) => resp.json())
-        .then((data) => {
-          set('user_data', JSON.stringify(data));
-          setCurrentUser(data);
-          toast.success('Login success.');
+      async function loginUser() {
+        try {
+          const { data } = await axios.post(
+            'http://localhost:3003/api/User/login',
+            { name: values.name, password: values.password },
+            { withCredentials: true }
+          );
 
+          set('user_data', JSON.stringify(data.user));
+          setCurrentUser(data.user);
+          toast.success('Login success.');
           setTimeout(() => {
             router.push('/messages');
-          }, 1000);
-        })
-        .catch((error) => {
-          console.error('Error: ', error);
+          }, 2000);
+        } catch (error) {
+          if (error.response.data.message) {
+            toast.error(error.response.data.message);
+          }
+        } finally {
           setSubmitting(false);
-        });
+        }
+      }
+
+      loginUser();
     },
   });
 
   useEffect(() => {
-    if (currentUser) router.push('/messages');
-  }, [currentUser]);
+    const isSignedIn = get('user_data');
+    if (isSignedIn) {
+      router.push('/messages');
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="grid h-screen items-center justify-center">
+        <Loader className="animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="grid justify-center px-4 py-8">

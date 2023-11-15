@@ -1,6 +1,6 @@
 export default function RightSidebar({ user }) {
   return (
-    <div className="bg-accent rounded-lg flex justify-center text-center items-center">
+    <div className="bg-accent rounded-lg justify-center text-center items-center hidden lg:flex">
       <div>
         <div className="avatar placeholder">
           <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
@@ -13,5 +13,5 @@ export default function RightSidebar({ user }) {
         <p className="mt-2">{user?.age}</p>
       </div>
     </div>
-  );
+  )
 }

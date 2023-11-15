@@ -1,33 +1,33 @@
 // TODO:: Protect the route.
 
-'use client';
+'use client'
 
-import { SocketContext } from '@/app/providers/SocketProvider';
-import { UsersContext } from '@/app/providers/UsersProvider';
-import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
+import { SocketContext } from '@/app/providers/SocketProvider'
+import { UsersContext } from '@/app/providers/UsersProvider'
+import Link from 'next/link'
+import { useContext, useEffect, useState } from 'react'
 
 export default function Sidebar({ uid }) {
-  const { users } = useContext(UsersContext);
-  const [userStatus, setUserStatus] = useState({ id: null, active: false });
-  const { isConnected, socket } = useContext(SocketContext);
+  const { users } = useContext(UsersContext)
+  const [userStatus, setUserStatus] = useState({ id: null, active: false })
+  const { isConnected, socket } = useContext(SocketContext)
 
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected) return
 
     function onUserStatus({ activeUserID, status, activeUserName }) {
-      setUserStatus({ id: activeUserID, active: status });
-      console.log('onUserStatus: ', activeUserID, status, activeUserName);
+      setUserStatus({ id: activeUserID, active: status })
+      console.log('onUserStatus: ', activeUserID, status, activeUserName)
     }
 
-    socket.on('userStatus', onUserStatus);
+    socket.on('userStatus', onUserStatus)
 
     return () => {
-      socket.off('userStatus', onUserStatus);
-    };
-  }, [isConnected]);
+      socket.off('userStatus', onUserStatus)
+    }
+  }, [isConnected])
 
-  console.log('USERS: ', users);
+  console.log('USERS: ', users)
 
   return (
     <div className="bg-accent rounded-lg max-h-full min-h-full overflow-auto relative">
@@ -68,9 +68,9 @@ export default function Sidebar({ uid }) {
                 className="absolute top-0 left-0 bottom-0 right-0"
               />
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
+  )
 }

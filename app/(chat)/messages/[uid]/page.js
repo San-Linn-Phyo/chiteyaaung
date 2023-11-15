@@ -1,23 +1,40 @@
-import Sidebar from "@/app/components/chat/Sidebar";
-import Chat from "@/app/components/chat/Chat";
-import RightSidebar from "@/app/components/chat/RightSidebar";
-import Header from "@/app/components/chat/Header";
+'use client';
 
-export default async function MessagePage({ params: { uid } }) {
-  const users = await (
-    await fetch("http://localhost:3003/api/User/user", { cache: "no-cache" })
-  ).json();
+import Loader from '@/app/components/Loader';
+import Header from '@/app/components/chat/Header';
+import MessageCollection from '@/app/components/chat/MessageCollection';
+import SendMessage from '@/app/components/chat/SendMessage';
+import { useLocalStorage } from '@/app/hooks/useLocalStorage';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-  const [user] = users.filter((user) => user._id === uid);
-  return (
-    <div className="flex flex-col min-h-screen max-h-screen">
-      <Header />
+export default function MessagePage({ params: { uid } }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const { get } = useLocalStorage();
+  const router = useRouter();
 
-      <div className="flex-grow grid grid-cols-[20%_60%_20%] py-4 px-8 h-full max-h-full overflow-hidden">
-        <Sidebar uid={uid} />
-        <Chat user={user} />
-        <RightSidebar user={user} />
+  useEffect(() => {
+    const isSignedIn = get('user_data');
+    if (!isSignedIn) {
+      router.push('/signin');
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="grid h-screen items-center justify-center">
+        <Loader className="animate-spin" />
       </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-screen max-h-screen">
+      <Header uid={uid} />
+      <MessageCollection uid={uid} />
+      <SendMessage uid={uid} />
     </div>
   );
 }
