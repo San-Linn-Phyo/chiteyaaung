@@ -1,36 +1,36 @@
-'use client'
+'use client';
 
-import { LocationArrow } from '@/app/assets/icons/LocationArrow'
-import { CurrentUserContext } from '@/app/providers/CurrentUserProvider'
-import { SocketContext } from '@/app/providers/SocketProvider'
-import { useContext, useEffect, useRef } from 'react'
+import { LocationArrow } from '@/app/assets/icons/LocationArrow';
+import { CurrentUserContext } from '@/app/providers/CurrentUserProvider';
+import { SocketContext } from '@/app/providers/SocketProvider';
+import { useContext, useRef } from 'react';
 
 export default function SendMessage({ uid }) {
-  const { currentUser } = useContext(CurrentUserContext)
-  const { socket, isConnected } = useContext(SocketContext)
-  const messageInputRef = useRef(null)
+  const { currentUser } = useContext(CurrentUserContext);
+  const { socket, isConnected } = useContext(SocketContext);
+  const messageInputRef = useRef(null);
 
   function clearMessageInput() {
-    messageInputRef.current.value = ''
+    messageInputRef.current.value = '';
   }
 
   function sentAMessage(message) {
-    if (!currentUser) return console.log('currentUser is null')
-    if (!isConnected) return console.log('Socket is not connected')
+    if (!currentUser) return console.log('currentUser is null');
+    if (!isConnected) return console.log('Socket is not connected');
 
     const msg = {
       message: message,
       from: currentUser._id,
       to: uid,
-    }
-    socket.emit('sendAMessage', msg)
+    };
+    socket.emit('sendAMessage', msg);
   }
 
   async function handleFormSubmit(e) {
-    e.preventDefault()
-    const message = messageInputRef.current.value
-    sentAMessage(message)
-    clearMessageInput()
+    e.preventDefault();
+    const message = messageInputRef.current.value;
+    sentAMessage(message);
+    clearMessageInput();
   }
 
   return (
@@ -48,5 +48,5 @@ export default function SendMessage({ uid }) {
         <LocationArrow className="w-5 h-5" />
       </button>
     </form>
-  )
+  );
 }

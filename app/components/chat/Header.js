@@ -10,7 +10,6 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 
 export default function Header({ uid }) {
   const [partner, setPartner] = useState();
@@ -70,11 +69,11 @@ export default function Header({ uid }) {
             ) : (
               <div className="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0 relative">
                 <img
-                  src={partner.image}
-                  alt={partner.name}
+                  src={partner?.image}
+                  alt={partner?.name}
                   className="w-12 h-12 rounded-full object-cover object-top"
                 />
-                {partner.isActive && (
+                {partner?.isActive && (
                   <span className="z-[8] absolute top-0 right-0 translate-x-1/2 w-2 h-2 bg-red-700 rounded-full" />
                 )}
               </div>
@@ -88,8 +87,8 @@ export default function Header({ uid }) {
                 </>
               ) : (
                 <>
-                  <span className="text-sm font-bold">{partner.name}</span>
-                  {partner.isActive && (
+                  <span className="text-sm font-bold">{partner?.name}</span>
+                  {partner?.isActive && (
                     <span className="text-sm">Active Now</span>
                   )}
                 </>
@@ -113,15 +112,15 @@ export default function Header({ uid }) {
             >
               <li>
                 <img
-                  src={partner.image}
-                  alt={partner.name}
+                  src={partner?.image}
+                  alt={partner?.name}
                   className="w-60 h-60 object-cover object-top"
                 />
                 <p>
-                  Age: <span>{partner.age}</span>
+                  Age: <span>{partner?.age}</span>
                 </p>
                 <p>
-                  Gender: <span>{partner.gender}</span>
+                  Gender: <span>{partner?.gender}</span>
                 </p>
               </li>
             </ul>

@@ -39,7 +39,7 @@ export default function SigninPage() {
           toast.success('Login success.');
           setTimeout(() => {
             router.push('/messages');
-          }, 2000);
+          }, 1500);
         } catch (error) {
           if (error.response.data.message) {
             toast.error(error.response.data.message);

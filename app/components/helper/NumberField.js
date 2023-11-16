@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function NumberField({
   id,
@@ -9,16 +9,16 @@ export default function NumberField({
   setFieldValue,
   allowStartingWithZero,
 }) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
 
   function handleChange(e) {
     const acceptedValue = e.target.value.trim();
     const isNumber = Number(acceptedValue);
     let isValid = false;
 
-    if (acceptedValue.trim() === "") isValid = true;
+    if (acceptedValue.trim() === '') isValid = true;
     else if (allowStartingWithZero && isNumber >= 0) isValid = isNumber >= 0;
-    else if (!allowStartingWithZero && !acceptedValue.startsWith("0"))
+    else if (!allowStartingWithZero && !acceptedValue.startsWith('0'))
       isValid = isNumber > 0;
 
     if (isValid) {

@@ -1,64 +1,62 @@
-'use client'
+'use client';
 
-import { CurrentUserContext } from '@/app/providers/CurrentUserProvider'
-import { SocketContext } from '@/app/providers/SocketProvider'
-import axios from 'axios'
-import Link from 'next/link'
-import { useContext, useEffect, useState } from 'react'
-
-const usersData = 'asdfjlasfdjljasdf'.split('')
+import { CurrentUserContext } from '@/app/providers/CurrentUserProvider';
+import { SocketContext } from '@/app/providers/SocketProvider';
+import axios from 'axios';
+import Link from 'next/link';
+import { useContext, useEffect, useState } from 'react';
 
 export default function ActiveUsers() {
-  const [users, setUsers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const { currentUser } = useContext(CurrentUserContext)
-  const { socket, isConnected } = useContext(SocketContext)
+  const [users, setUsers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { currentUser } = useContext(CurrentUserContext);
+  const { socket, isConnected } = useContext(SocketContext);
 
   useEffect(() => {
-    if (!currentUser) return
+    if (!currentUser) return;
 
     const fetchActiveUsers = async function () {
       try {
         const url =
-          'http://localhost:3003/api/User/active?id=' + currentUser._id
+          'http://localhost:3003/api/User/active?id=' + currentUser._id;
 
-        const response = await axios.get(url)
-        setUsers(response.data)
-        setIsLoading(false)
+        const response = await axios.get(url);
+        setUsers(response.data);
+        setIsLoading(false);
       } catch (error) {
         console.log(
           `file: ActiveUsers.js:28 ~ fetchActiveUsers ~ error:`,
           error
-        )
+        );
       }
-    }
+    };
 
-    fetchActiveUsers()
-  }, [currentUser])
+    fetchActiveUsers();
+  }, [currentUser]);
 
   useEffect(() => {
-    if (!isConnected || !currentUser) return
+    if (!isConnected || !currentUser) return;
 
     function onReceivingNewActiveUser(activeUser) {
-      setUsers((prevUsers) => [...prevUsers, activeUser])
+      setUsers((prevUsers) => [...prevUsers, activeUser]);
     }
 
     function onReceivingNewInActiveUser(inActiveUser) {
       setUsers((prevUsers) => {
-        return prevUsers.filter((user) => user._id !== inActiveUser._id)
-      })
+        return prevUsers.filter((user) => user._id !== inActiveUser._id);
+      });
     }
 
-    socket.on('receiveNewActiveUser', onReceivingNewActiveUser)
+    socket.on('receiveNewActiveUser', onReceivingNewActiveUser);
 
-    socket.on('receiveNewInActiveUser', onReceivingNewInActiveUser)
+    socket.on('receiveNewInActiveUser', onReceivingNewInActiveUser);
 
     return () => {
-      socket.off('receiveNewActiveUser', onReceivingNewActiveUser)
-      socket.off('receiveNewInActiveUser', onReceivingNewInActiveUser)
-    }
-  }, [isConnected, currentUser])
+      socket.off('receiveNewActiveUser', onReceivingNewActiveUser);
+      socket.off('receiveNewInActiveUser', onReceivingNewInActiveUser);
+    };
+  }, [isConnected, currentUser]);
 
   if (isLoading) {
     return (
@@ -72,10 +70,10 @@ export default function ActiveUsers() {
               }`}
               key={index}
             />
-          )
+          );
         })}
       </div>
-    )
+    );
   }
 
   return (
@@ -97,8 +95,8 @@ export default function ActiveUsers() {
               className="absolute left-0 right-0 top-0 bottom-0 z-10"
             />
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

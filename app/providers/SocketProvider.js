@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { CurrentUserContext } from "./CurrentUserProvider";
-import { io } from "socket.io-client";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import { CurrentUserContext } from './CurrentUserProvider';
 
 export const SocketContext = createContext(undefined);
 
@@ -23,10 +23,10 @@ export default function SocketProvider({ children }) {
       setIsConnected(true);
     }
 
-    websocket.on("connect", onConnect);
+    websocket.on('connect', onConnect);
 
     return () => {
-      websocket.off("connect", onConnect);
+      websocket.off('connect', onConnect);
     };
   }, [currentUser]);
 

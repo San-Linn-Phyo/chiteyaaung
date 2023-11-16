@@ -1,7 +1,7 @@
-import SocketProvider from "./SocketProvider";
-import CurrentUserProvider from "./CurrentUserProvider";
-import UsersProvider from "./UsersProvider";
-import UnreadMessagesProvider from "./UnreadMessagesProvider";
+import CurrentUserProvider from './CurrentUserProvider';
+import SocketProvider from './SocketProvider';
+import UnreadMessagesProvider from './UnreadMessagesProvider';
+import UsersProvider from './UsersProvider';
 
 export default function Providers({ children }) {
   return (

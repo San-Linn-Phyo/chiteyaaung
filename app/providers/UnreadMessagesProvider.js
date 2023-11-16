@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { CurrentUserContext } from "./CurrentUserProvider";
-import { SocketContext } from "./SocketProvider";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { CurrentUserContext } from './CurrentUserProvider';
+import { SocketContext } from './SocketProvider';
 
 export const UnreadMessagesContext = createContext(undefined);
 
@@ -21,12 +21,12 @@ export default function UnreadMessagesProvider({ children }) {
       setUnreadMessages((prev) => [...prev, message]);
     }
 
-    socket.emit("loadAllUnreadMessages", currentUser._id);
-    socket.on("allUnreadMessages", handleLoadedUnreadMessages);
-    socket.on("newUnreadMessage", handleNewUnreadMessage);
+    socket.emit('loadAllUnreadMessages', currentUser._id);
+    socket.on('allUnreadMessages', handleLoadedUnreadMessages);
+    socket.on('newUnreadMessage', handleNewUnreadMessage);
     return () => {
-      socket.off("unreadmessages", handleLoadedUnreadMessages);
-      socket.off("newUnreadMessage", handleNewUnreadMessage);
+      socket.off('unreadmessages', handleLoadedUnreadMessages);
+      socket.off('newUnreadMessage', handleNewUnreadMessage);
     };
   }, [isConnected]);
 
